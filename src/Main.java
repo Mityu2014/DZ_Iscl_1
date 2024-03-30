@@ -12,50 +12,59 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите данные разделенные пробелом: Фамилия Имя Отчество дата _ рождения номер _ телефона пол: ");
         String next = scanner.nextLine();
-        String[] split = next.split(" ");
-        if (split.length != 6) {
-            throw new MyArraySizeExeption(split.length);
+        String[] splitData = next.split(" ");
+        boolean flag = true;
+        // Проверка на корректное количество введенных данных
+        if (splitData.length != 6) {
+            throw new MyArraySizeExeption(splitData.length);
         }
-        String name = split[0]; // Имя
-        String dateString = split[3];
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        // Проверка на корректное введение даты
         try {
-            LocalDate date = getDateFromString(dateString, format); // Дата
+            getDateFromString(splitData[3], DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         }catch (DateTimeParseException e) {
-            System.out.println("Exeption: Введенная дата " + dateString + " не соответствует формату даты dd.mm.yyyy");
+            System.out.println("Exeption: Введенная дата " + splitData[3] + " не соответствует формату даты dd.mm.yyyy");
+            flag = false;
         }
+        // Проверка на корректное введение телефона
         try {
-            int numberTel = Integer.parseInt(split[4]); // Телефон
+            Integer.parseInt(splitData[4]);
         } catch (NumberFormatException e){
-            System.out.println("Exeption: Номер телефона " + split[4] + " введен некорректно");
+            System.out.println("Exeption: Номер телефона " + splitData[4] + " введен некорректно");
+            flag = false;
         }
-        char male = split[5].charAt(0);
-        if (split[5].length() > 1 || (male != 'm' && male != 'f')){
-            throw new MyMaleExeption (male);
+        // Проверка на корректное введение пола f или m
+        if (splitData[5].length() > 1 || (!splitData[5].equals("m") && !splitData[5].equals("f"))){
+            flag = false;
+            throw new MyMaleExeption (splitData[5]);
         }
-
-        String person = "<";
-        for (int i = 0; i < split.length - 1; i++) {
-            person =person + split[i] +"> <";
-        }
-        person = person + split[5] +">" +"\n";
-        String fn = name + ".txt";
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(fn, true);
-            fw.write(person);
-            fw.flush();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        if (flag) {
+            // собираем строку для записи в файл
+            String person = "<";
+            for (int i = 0; i < splitData.length - 1; i++) {
+                person = person + splitData[i] + "> <";
+            }
+            person = person + splitData[5] + ">" + "\n";
+            // проверка на корректную работу с файлом
+            String fn = splitData[0] + ".txt";
+            try {
+                fileNotFound(fn, person);
+            } catch (NonExistedFileExeption e) {
+                e.printStackTrace();
             }
         }
+    }
 
-
-
+    public static void fileNotFound (String pathFile,String person) throws NonExistedFileExeption {
+        try (FileWriter fw = new FileWriter(pathFile, true);){
+            fw.write(person);
+            fw.flush();
+        }catch (IOException e){
+            throw new NonExistedFileExeption();
+        }
+    }
 
         public static LocalDate getDateFromString (String string, DateTimeFormatter format){
             LocalDate date = LocalDate.parse(string, format);
             return date;
         }
-
 }
