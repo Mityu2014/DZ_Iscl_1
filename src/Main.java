@@ -1,13 +1,12 @@
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-
 public class Main {
     //Иванов Иван Иванович 01.01.2024 123456 m
+    //Петров Иван Иванович 01.01.2024 123456 m
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите данные разделенные пробелом: Фамилия Имя Отчество дата _ рождения номер _ телефона пол: ");
